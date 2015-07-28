@@ -1,13 +1,17 @@
 module.exports = function (browser, callback) {
   describe('the Build Page', function () {
 
+    beforeEach(function() {
+      this.currentTest.browser = browser;
+    });
+
     it('should show the project listing page', function () {
       return browser.rel('/')
         .elementByName('email')
         .type('test2@example.com')
         .elementByName('password')
         .type('test')
-        .elementById('navbar-signin-form')
+        .elementByClassName('login-form')
         .submit()
         .elementsByCssSelector('[data-test="latest-build"]')
         .then(function (items) {

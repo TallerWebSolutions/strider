@@ -1,8 +1,7 @@
-var _ = require('underscore')
-  , expect = require('chai').expect
-  , fs = require('fs')
-  , path = require('path')
-  , lconf = require('../../lib/libconfig.js')
+var _ = require('lodash');
+var expect = require('chai').expect;
+var lconf = require('../../lib/libconfig.js');
+var sinon = require('sinon');
 
 describe('config', function () {
 
@@ -29,15 +28,18 @@ describe('config', function () {
     })
 
     it('should ignore invalid JSON', function () {
+      sinon.stub(console, 'warn')
       var rc = {}
         , gc = {appId: 'theid', appSecret: 'the Secret', port: 3000, hostname: 'mensch'}
       lconf.addPlugins(rc, {
         PLUGIN_GITHUB: JSON.stringify(gc),
         PLUGIN_BITBUCKET: 'not valid json'
       })
+      expect(console.warn.callCount).to.eq(1);
       expect(rc.plugins).to.eql({
         github: gc
       })
+      console.warn.restore();
     })
 
     it('should get individual variables', function () {
@@ -60,16 +62,19 @@ describe('config', function () {
   })
 
   it('should arrange the smtp config', function () {
-    var oe = process.env
-      , config
+    var oe = process.env;
+    var config;
+
     process.env = _.extend({}, process.env, {
       SMTP_HOST: 'here',
       SMTP_PORT: 777,
       SMTP_USER: 'me',
       SMTP_PASS: 'mine',
       SMTP_FROM: 'me@example.com'
-    })
-    config = lconf.getConfig(true)
+    });
+
+    config = lconf.getConfig();
+
     expect(config.smtp).to.eql({
       host: 'here',
       port: 777,
@@ -78,11 +83,13 @@ describe('config', function () {
         pass: 'mine'
       },
       from: 'me@example.com'
-    })
-    process.env = oe
-  })
+    });
+
+    process.env = oe;
+  });
 
   it('should pick up legacy github variables', function () {
+    sinon.stub(console, 'warn')
     var oe = process.env
       , config
     process.env = _.extend({}, process.env, {
@@ -99,6 +106,8 @@ describe('config', function () {
     config = lconf.getConfig()
     expect(config.plugins.github.appId).to.equal('one')
     expect(config.plugins.github.appSecret).to.equal('two')
+    expect(console.warn.callCount).to.eq(8);
+    console.warn.restore();
   })
 
   it('should pick up non-prefixed items', function () {

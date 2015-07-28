@@ -1,1 +1,1 @@
-# Dummy Gemfile required for Heroku buildpacks
+source "https://rubygems.org"

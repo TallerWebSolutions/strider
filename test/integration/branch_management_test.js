@@ -1,22 +1,26 @@
 module.exports = function (browser, callback) {
   describe('Branch Management', function () {
 
+    beforeEach(function() {
+      this.currentTest.browser = browser;
+    });
+
     it('should show the branch management panel', function () {
       return browser.rel('/')
         .elementByName('email')
         .type('test2@example.com')
         .elementByName('password')
         .type('test')
-        .elementById('navbar-signin-form')
+        .elementByClassName('login-form')
         .submit()
-        .waitForElementByClassName('logged-in')
+        .waitForElementById('job-list')
         .rel('/strider-cd/test-node/config')
         .waitForElementByCssSelector('#project_config_branches')
         .isDisplayed()
     })
 
     it('should add a new branch to be watched', function () {
-      return browser.rel('/strider-cd/test-node/config')
+      return browser.rel('/strider-cd/test-node/config/tab-branches')
         .elementByName('name')
         .type('feature/*')
         .elementByCssSelector('#project_config_branches form button')

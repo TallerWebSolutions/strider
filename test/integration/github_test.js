@@ -1,6 +1,24 @@
+var deleteHooks = require('strider-github/lib/api').deleteHooks
+
 module.exports = function (browser, callback) {
 
   describe('Github Integration', function () {
+    var robot = {
+      username: 'strider-test-robot',
+      password: 'i0CheCtzY0yv4WP2o',
+      repo: 'strider-extension-loader',
+      token: 'df24805561a32092b24fe274136c299e842d5fcf'
+    }
+
+    before(function(done) {
+      var url = 'http://localhost:4000/'+robot.username+'/'+robot.repo+'/api/github/webhook'
+      var repo = robot.username+'/'+robot.repo
+      deleteHooks(repo, url, robot.token, done)
+    })
+
+    beforeEach(function() {
+      this.currentTest.browser = browser;
+    });
 
     it('should link account with github', function () {
       return browser.rel('/')
@@ -8,16 +26,16 @@ module.exports = function (browser, callback) {
         .type('test1@example.com')
         .elementByName('password')
         .type('open-sesame')
-        .elementById("navbar-signin-form")
+        .elementByClassName('login-form')
         .submit()
         .elementByClassName('provider-github')
         .click()
         .waitForElementByClassName('octicon-logo-github', 6000)
         .isDisplayed()
         .elementByName('login')
-        .type('strider-test-robot')
+        .type(robot.username)
         .elementByName('password')
-        .type("i0CheCtzY0yv4WP2o")
+        .type(robot.password)
         .elementByName('commit')
         .click()
         .waitForElementByClassName('StriderBlock_Brand', 6000)
@@ -35,7 +53,7 @@ module.exports = function (browser, callback) {
         .waitForElementByLinkText('Click to watch it run', 3000)
         .click()
         .waitForElementByCssSelector('.job-repo', 2000)
-        .url().should.eventually.include('strider-test-robot/strider-extension-loader')
+        .url().should.eventually.include(robot.username+'/'+robot.repo)
     })
 
     after(function () {
@@ -45,6 +63,4 @@ module.exports = function (browser, callback) {
     })
 
   })
-
 }
-

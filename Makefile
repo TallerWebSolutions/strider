@@ -5,28 +5,12 @@ else
 test-env := test-sauce
 endif
 
-build: less
-	@:
+build:
+	npm run build
 
-less_files := strider.less config.less build.less dashboard.less projects.less admin/users.less
-css_files := $(patsubst %.less,public/stylesheets/css/%.css,$(less_files))
-
-less: $(css_files)
-
-public/stylesheets/css/%.css: public/stylesheets/less/%.less
-	./node_modules/.bin/lessc $< > $@
-
-# === Dev ===
-
-watch:
-	watch make
-
-serve:
-	@./bin/strider
 
 ## ================= Test Suite ====================================
-
-test: test-syntax test-smoke test-unit test-browser
+test: build test-syntax test-smoke test-unit test-browser
 
 test-smoke:
 	# TODO Smoke tests should fail _fast_ on silly errors.
@@ -34,7 +18,6 @@ test-smoke:
 test-unit:
 	@./node_modules/.bin/mocha -R spec test/unit/test_middleware.js
 	@./node_modules/.bin/mocha -R spec test/unit/test_ansi.js
-	@./node_modules/.bin/mocha -R spec test/unit/test_api.js
 	@./node_modules/.bin/mocha -R spec test/unit/test_config.js
 	@./node_modules/.bin/mocha -R spec test/unit/test_utils.js
 
@@ -67,6 +50,12 @@ test-local:
 	# You need to run chromedriver for this to work. If you don't have it,
 	# you can get it w/ npm install -g chromedriver
 	# Then `chromedriver  --url-base=/wd/hub`
+	#
+	# Limit to a single test suite by specifying the filename:
+	# e.g. TEST_SUITE=login_test make test-local
+	#
+	# You can combine this with `watchy` to improve your workflow:
+	# e.g. TEST_SUITE=login_test watchy -w test/integration/login_test.js -- make test-local
 	$(which chromedriver)
 	WEBDRIVER_REMOTE='{"hostname":"localhost","port":9515}' BROWSERS='[{"version":"","browserName":"chrome","platform":"Linux"}]' ./node_modules/mocha/bin/mocha -R spec test/runner.js
 
@@ -79,27 +68,13 @@ test-client-local:
 
 test-syntax: lint
 
-tolint := *.js *.json lib routes public/javascripts/pages public/javascripts/modules
+tolint := *.js *.json lib client
 
 lint:
 	@./node_modules/.bin/jshint --verbose $(tolint)
-
-strider_sub := strider-env strider-simple-worker strider-python strider-sauce strider-custom strider-ruby
-
-link:
-	npm link $(strider_sub)
-
-unlink:
-	npm install $(strider_sub)
 
 authors-list:
 	git shortlog -e -n -s $$commit | awk '{ args[NR] = $$0; sum += $$0 } END { for (i = 1; i <= NR; ++i) { printf "%-60s %2.1f%%\n", args[i], 100 * args[i] / sum } }' > AUTHORS
 
 
-release: test build authors-list
-	npm version minor
-
-
-
-
-.PHONY: test lint watch build less start-chromedriver
+.PHONY: test lint start-chromedriver

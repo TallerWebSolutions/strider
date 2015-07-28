@@ -5,24 +5,38 @@
 
 # you can hack on them by editing under node_moduldes/strider-foo
 
-DEPS="strider-custom strider-python strider-node strider-env strider-sauce strider-simple-runner strider-extension-loader strider-github strider-ruby"
+ARGS=$@
+case "${ARGS[@]}" in *"--sudo-link"*) SUDOLINK="sudo" ;; esac
+case "${ARGS[@]}" in *"--ignore-link-fail"*) IGNORELINKFAIL="YES" ;; esac
 
-# NOTE: There are other modules we should make sure work with 1.4 too:
-# DEPS="$DEPS strider-jelly strider-qunit strider-browserstack"
+npm install lodash
+DEPS=$(node -e "var _ = require('lodash'), deps = _.keys(require('./package').dependencies); console.log(_.filter(deps, function(i){ return /^strider-/.test(i) }).join(' '));")
 
-BASE="git@github.com:/Strider-CD"
+BASE="git@github.com:Strider-CD"
 
 mkdir -p node_modules
 
+
 for module in $DEPS
 do
-  if [ "$1" = "up" ]
-  then
-    (cd ../$module && git pull && rm -rf node_modules && npm i)
-  else
+  if [ ! -d ../$module ]; then
     git clone $BASE/$module ../$module
-    (cd ../$module && npm install)
-    npm link ../$module
+  fi
+  pushd ../$module
+  npm i
+  popd
+  if [ ! -L $PWD/node_modules/$module ]; then
+    $SUDOLINK npm link ../$module
+    if [ $? != 0 ]; then
+      echo "Failed to link $module"
+      if [ -z $SUDOLINK ]; then
+        echo "You may need to use root for npm link, pass in --sudo-link to run the command with sudo."
+      fi
+      if [ -z $IGNORELINKFAIL ]; then
+        echo "If you want to ignore link failures, pass in --ignore-link-fail"
+        exit -1
+      fi
+    fi
   fi
 done
 

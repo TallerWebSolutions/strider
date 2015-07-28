@@ -2,15 +2,55 @@
 
 # Upcoming Releases
 
-## 1.5
+## Future
 
-- Multiple sub-jobs (need to work out nomenclature) - allowing testing in different environments
-- Refactor models into an API rather than relying on mongo queries everywhere.
-- Easier theming (theme plugin type)
-- Make strider a class - no more global shared scope
-- Auth plugins
+- Initial setup via UI ([#681](https://github.com/Strider-CD/strider/pull/681))
+- Use latest core plugins
+
 
 # Changelog / Past releases
+
+## 1.7.0 - 2015-07-23
+
+- Upgrade all plugins ([#671](https://github.com/Strider-CD/strider/issues/671))
+- Fix config in Firefox ([#717](https://github.com/Strider-CD/strider/issues/717))
+- Easier install (no bower issues) ([#764](https://github.com/Strider-CD/strider/issues/764))
+- Many more bugs fixed, see the diff [2e3106a4...402c1d6](https://github.com/Strider-CD/strider/compare/2e3106a4bb228537727e8953c93efd7d754fcc56...402c1d6)
+
+## 1.6.5 - 2015-03-27
+
+- [FEATURE] Corporate Proxy Support ([#741](https://github.com/Strider-CD/strider/pull/741))
+- [ENHANCEMENT] io.js support ([commit](https://github.com/Strider-CD/strider/commit/d7f25263e89fb0d84cb43d86c981b84ac7a6f373))
+- [ENHANCEMENT] Make configure button more obvious on build page ([commit](https://github.com/Strider-CD/strider/commit/f271df1ebaeefaa41a97bfb42ce8789db2d3a86f))
+- [BUGFIX] mongoose version issues ([#752](https://github.com/Strider-CD/strider/issues/752))
+- [BUGFIX] Fix issue with mission critical routes ([#748](https://github.com/Strider-CD/strider/issues/748))
+- Readme updates
+
+## 1.6.0 - 2015-01-10
+
+- Docker support in core.
+- Bring back password reset.
+- addUser retry if email taken.
+- `strider addUser -f` for overwritting user.
+- New project config page layout, see #629
+- Plugin manager
+- Invite revoke
+- Layout/Style fixes
+- Plugin dependency updates
+- Bug fixes
+- Modular client-side (browserify)
+- Major cleanup of client-side code
+- strider-cli moved out
+- etc..
+
+
+## 1.5.0 - 2014-08-18
+
+- Many bugfixes and improvements.
+- New plugin: strider-ssh-deploy. Continuously deploy your code to servers over SSH. [ https://github.com/Strider-CD/strider-ssh-deploy ]
+- New plugin: strider-slack: SlackHQ integration [ https://github.com/Strider-CD/strider-slack ]
+- New Plugin: strider-metadata: Add job metadata to environment [ https://github.com/Strider-CD/strider-metadata ]
+
 
 ## 1.4.5
 

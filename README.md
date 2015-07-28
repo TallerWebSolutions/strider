@@ -1,10 +1,9 @@
 # ![Strider][logo]
 
-[![Dependency Status][dep-img]][dep-link]
-[![devDependency Status][dev-dep-img]][dev-dep-link]
-[![NPM][npm-badge-img]][npm-badge-link]
----
+[![NPM][npm-badge-img]][npm-badge-link]  
+[![Code Climate][cc-badge]][cc-badge-link] [![Dependency Status][david-badge]][david-badge-link] [![Build Status][travis-badge]][travis-badge-link]
 
+---
 
 ### Brilliant Continuous Deployment
 
@@ -19,38 +18,38 @@ Overview
 platform. It is written in Node.JS / JavaScript and uses MongoDB as a backing
 store. It is published under the BSD license.
 
-For more details, including features and more, check out the 
-[introductory chapter of the Strider Book][book-intro]
+Strider is extremely customizable through plugins. Plugins can 
 
+- add hooks to perform arbitrary actions during build.
+- modify the database schema to add custom fields.
+- register their own HTTP routes.
+- subscribe to and emit socket events.
+- create or modify user interfaces within Strider.
+- so much more! just use your imagination!
 
 ## README Contents
 
 - [General requirements](#general-requirements)
-- [Docker quickstart](#docker-quickstart)
 - [Running on Infrastructure](#running-on-infrastructure)
     - [Configuring](#configuring)
     - [Adding Users](#adding-initial-admin-user)
     - [Starting Strider](#starting-strider)
     - [Heroku](#strider-on-heroku)
-- [Require()'ing Strider](#requireing-strider)
-- [Extension & plugin guide](#extending--customizing-strider)
+    - [Docker](#strider-in-docker)
+- [Advanced Topics](#advanced-topics)
+- [API Documentation](#api-documentation)
 - [Support & Help](#support--help)
 - [Roadmap / Changelog][roadmap]
 
 ## General Requirements
 
-- nodejs, v0.8 or v0.10
-- mongodb (local or remote)
-- git
+- [nodejs] >= v0.10
+- [npm] >= 2.0
+- [git] >= 2.0
+- [mongodb][mongo-download] (local or remote)
+- [node-gyp]
 
-## Docker Quickstart
-
-`docker pull niallo/strider`
-
-For a fully self-contained and pre-built strider installation, check out
-the [Strider Trusted Build][pre-built].
-
-There's a walkthrough of setting it up [on our blog][blog-walkthrough].
+_Note: Installing on OS X might require XCode to be installed._
 
 
 ## Running on Infrastructure
@@ -66,27 +65,37 @@ by executing the following command in the project root:
 npm install
 ```
 
+> Note: Sometimes there are issues with permissions and installing global modules, in those cases run `npm config set prefix ~/npm` to set your global modules directory to '~/npm'. You will also have to add `~/npm/bin` to your `PATH` environment variable.
+
 ### Configuring
 
 `Strider` configuration comes from environment variables. Most of the default
 values should work fine for running on localhost, however for an
 Internet-accessible deployment the following variables will need to be exported:
 
-  - `DB_URI` : MongoDB DB URI if not localhost (you can safely use MongoLab free plan - works great)
-  - `SERVER_NAME` : Address at which server will be accessible on the Internet. E.g. `https://strider.example.com` (note: no trailing slash)
-  - `PLUGIN_GITHUB_APP_ID`, `PLUGIN_GITHUB_APP_SECRET`: Github app ID & secret (assuming not running on localhost:3000) - you can register a new one
-  at https://github.com/settings/applications/new - the Main URL should be the same as server name above,
-  and the callback URL should be server name with the path /auth/github/callback.
-  E.g. https://strider.example.com/auth/github/callback
-  - `PLUGIN_BITBUCKET_APP_KEY`, `PLUGIN_BITBUCKET_APP_SECRET`, `PLUGIN_BITBBUCKET_HOSTNAME`: BitBucket app key, secret & server hostname. Needed if you're using BitBucket provider. More info at https://github.com/Strider-CD/strider-bitbucket.
+  - `SERVER_NAME` - Required; Address at which server will be accessible on the Internet. E.g. `https://strider.example.com` (note: no trailing slash)
+  - `HOST` - Host where strider listens, optional (defaults to 0.0.0.0).
+  - `PORT` - Port that strider runs on, optional (defaults to 3000).
+  - `STRIDER_CLONE_DEST` - Where the repositories are cloned to (defaults to ~/.strider)
+  - `DB_URI` - MongoDB DB URI if not localhost (you can safely use [MongoLab free plan][mongolab] - works great)
+  - `HTTP_PROXY` - Proxy support, optional (defaults to null)
+  - If you want email notifications, configure an SMTP server (we recommend [Mailgun] for SMTP if you need a server - free account gives 200 emails / day):
+    - `SMTP_HOST` - SMTP server hostname e.g. smtp.example.com
+    - `SMTP_PORT` - SMTP server port e.g. 587 (default)
+    - `SMTP_USER` - SMTP auth username e.g. "myuser"
+    - `SMTP_PASS` - SMTP auth password e.g. "supersecret"
+    - `SMTP_FROM` - Default FROM address e.g. "Strider <noreply@stridercd.com>" (default)
 
-  - If you want email notifications, configure an SMTP server (we recommend Mailgun for SMTP if you need a server - free account gives 200 emails / day):
-    - `SMTP_HOST`: SMTP server hostname e.g. smtp.example.com
-    - `SMTP_PORT`: SMTP server port e.g. 587 (default)
-    - `SMTP_USER`: SMTP auth username e.g. "myuser"
-    - `SMTP_PASS`: SMTP auth password e.g. "supersecret"
-    - `SMTP_FROM`: Default FROM address e.g. "Strider <noreply@stridercd.com>" (default)
+#### Additional Configurations
 
+- `BODY_PARSER_LIMIT` - Increase the maximum payload size that our [body parser][body-parser] will attempt to parse. Useful for github web hooks.
+
+You might need to follow these instructions if you use any of these, please do so before filing issues.
+
+- [Github][github-config]  
+- [Bitbucket][bitbucket-config]  
+- [Gitlab][gitlab-config]  
+- [Heroku][heroku-config]  
 
 ### Adding Initial Admin User
 
@@ -99,93 +108,80 @@ node bin/strider addUser
 
 Example run:
 
-```bash
+```no-highlight
 $ node bin/strider addUser
 Enter email []: strider@example.com
 Is admin? (y/n) [n]: y
 Enter password []: *******
 
-Email:		strider@example.com
-Password:	****
-isAdmin:	true
+Email:    strider@example.com
+Password: ****
+isAdmin:  true
 OK? (y/n) [y]:
 22 Oct 21:21:01 - info: Connecting to MongoDB URL: mongodb://localhost/strider-foss
 22 Oct 21:21:01 - info: User added successfully! Enjoy.
 ```
 
+See the [strider-cli] for more details.
 
 ### Starting Strider
 
 Once `Strider` has been installed and configured, it can be started with:
 
 ```no-highlight
-node bin/strider
+NODE_ENV=production npm start
 ```
 
 ### Strider on Heroku
 
-To get up and running quickly on Heroku, you can create a new app and use the
-MongoLab free plan.
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-```no-highlight
-heroku create
-heroku addons:add mongolab
-git push heroku master
-heroku open
-```
-
-If you want support for languages other than Node.js and Python, you'll need to
-set the buildpack for your app. Currently this enables support for Ruby 2.0.0.
-
-```no-highlight
-heroku config:add BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi.git
-```
-
-## Require()'ing Strider
-
-Strider can be `require()`-ed like any other NPM module. This is particularly useful when you want to
-
-- Make Strider a dependency at a specific version
-- Choose exactly which plugins to install
-- Customize configuration
-- Do other crazy stuff
-
-For example, you could have a project with its own `package.json` that depends
-on `strider` at a specific version, along with any other extensions you choose
-loaded from a particular filesystem location. Then you could write a simple
-initialization shim like the following:
-
-```JavaScript
-var strider = require('strider')
-
-var instance = strider("/path/to/extensions/dir", config, function(err, initialized, appInstance) {
-    console.log("Strider is now running")
-})
-```
+To get up and running quickly on Heroku, you can simply use the button above.
+If you run into any issues, see the [wiki entry](https://github.com/Strider-CD/strider/wiki/Strider-on-Heroku).
 
 
-## Extending & Customizing Strider
+### Strider in Docker
 
-Strider is extremely customizable and extensible through plugins. Plugins can add hooks to perform arbitrary actions
-during build. They can modify the database schema to add custom fields. They can also register their own HTTP routes. Even
-the front-end is highly customizable through template extensions.
+Many users like to run Strider within a Docker container.
+Although this works well, supporting it is outside the scope of the Strider project.
 
-For documentation on extending Strider, see [strider-extension-loader][extending]'s README.
+We recommend using [docker-strider](https://github.com/Strider-CD/docker-strider) as a base image when designing your Docker-based Strider installation.
+Please post related issues in the [issues section](https://github.com/Strider-CD/docker-strider/issues) for that repository.
 
 
 ## Resources
 
 - [Strider on DigitalOcean][resource-digitalocean] - Covers setting up an Ubuntu machine with Strider using upstart.
+- [Strider plugin template][resource-plugin-template] - Simple setup for getting started with your own plugin.
+- [Panamax Strider template][resource-panamax-template] - Strider template for use with Panamax.
+
+
+## Advanced Topics
+
+Advanced topics are located in the [Wiki](https://github.com/Strider-CD/strider/wiki), here's a small
+subset of what's covered:
+
+- [Requiring Strider](https://github.com/Strider-CD/strider/wiki/Requiring-Strider)
+- [Managing Plugins](https://github.com/Strider-CD/strider/wiki/Managing-Plugins)
+
+## API Documentation
+
+An effort has been started to document the existing REST API, and to have versioned documentation going forward.
+We use [apiDoc] for the documentation.
+
+To build the documentation run `npm run gendocs` and the documentation will be accessable from `apidocs/index.html`.
 
 ## Support & Help
 
-IRC: irc.freenode.net #strider
-
 We are very responsive to Github Issues - please think of them as a message board for the project!
 
-Strider is maintained and supported by [FrozenRidge,
-LLC][maintainer]. For commercial support, customization, integration
-& hosting enquiries please email hi@frozenridge.co.
+### IRC Channel
+
+You can find us on [irc.freenode.net in #strider][irc].
+
+If nobody is responding, don't leave immediately. Someone will eventually respond. If you don't want to wait please create a Github issue! Many Strider contributors don't use IRC at all, but will respond pretty quickly to new Github Issues.
+
+For a view of what's going on with the project, check out our boards by setting up [ZenBoard] and visiting the "Boards" page.
 
 
 [logo]: https://raw.github.com/Strider-CD/strider/master/public/images/top_github.png
@@ -195,16 +191,36 @@ LLC][maintainer]. For commercial support, customization, integration
 [dep-link]: https://david-dm.org/Strider-CD/strider
 [dev-dep-img]: https://david-dm.org/Strider-CD/strider/dev-status.svg
 [dev-dep-link]: https://david-dm.org/Strider-CD/strider#info=devDependencies
-[npm-badge-img]: https://nodei.co/npm/strider.svg
+[npm-badge-img]: https://nodei.co/npm/strider.svg?downloads=true&stars=true
 [npm-badge-link]: https://nodei.co/npm/strider/
 [screenshot]: /docs/screenshots/dashboard.jpg?raw=true
 [more-screenshots]: https://github.com/Strider-CD/strider/wiki/Screenshots
+[mongolab]: https://mongolab.com/plans/pricing/
+[mailgun]: http://www.mailgun.com/pricing
 [book-intro]: http://strider.readthedocs.org/en/latest/intro.html
 [roadmap]: https://github.com/Strider-CD/strider/blob/master/ROADMAP.md
-[pre-built]: https://index.docker.io/u/niallo/strider/
-[blog-walkthrough]: http://blog.frozenridge.co/docker-and-stridercd-brilliant-continuous-integration-in-a-box/
 [mongo-download]: http://www.mongodb.org/downloads
-[nodejs]: http://nodejs.org
 [resource-digitalocean]: http://fosterelli.co/creating-a-private-ci-with-strider.html
+[resource-plugin-template]: https://github.com/bitwit/strider-template
+[resource-panamax-template]: https://github.com/CenturyLinkLabs/panamax-contest-templates/blob/master/stridercd_mrsmith.pmx
 [extending]: https://github.com/Strider-CD/strider-extension-loader
 [maintainer]: http://frozenridge.co
+[strider-cli]: https://github.com/Strider-CD/strider-cli
+[github-config]: https://github.com/Strider-CD/strider-github#required-configuration
+[bitbucket-config]: https://github.com/Strider-CD/strider-bitbucket#configuration
+[gitlab-config]: https://github.com/Strider-CD/strider-gitlab#setup
+[heroku-config]: https://github.com/Strider-CD/strider-heroku#important-config
+[cc-badge]: https://codeclimate.com/github/Strider-CD/strider/badges/gpa.svg
+[cc-badge-link]: https://codeclimate.com/github/Strider-CD/strider
+[david-badge]: https://david-dm.org/Strider-CD/strider.svg
+[david-badge-link]: https://david-dm.org/Strider-CD/strider
+[body-parser]: https://github.com/expressjs/body-parser
+[node-gyp]: https://github.com/TooTallNate/node-gyp#installation
+[git]: http://git-scm.com/
+[nodejs]: http://nodejs.org/
+[npm]: https://docs.npmjs.com/getting-started/installing-node
+[ZenBoard]: https://www.zenhub.io/
+[irc]: https://www.irccloud.com/#!/ircs://irc.freenode.net:6697/%23strider
+[travis-badge]: https://travis-ci.org/Strider-CD/strider.svg
+[travis-badge-link]: https://travis-ci.org/Strider-CD/strider
+[apiDoc]: http://apidocjs.com/#getting-started
