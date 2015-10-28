@@ -1,7 +1,6 @@
 # ![Strider][logo]
 
-[![NPM][npm-badge-img]][npm-badge-link]  
-[![Code Climate][cc-badge]][cc-badge-link] [![Dependency Status][david-badge]][david-badge-link] [![Build Status][travis-badge]][travis-badge-link]
+[![NPM][npm-badge-img]][npm-badge-link] [![Code Climate][cc-badge]][cc-badge-link] [![Dependency Status][david-badge]][david-badge-link] [![Build Status][travis-badge]][travis-badge-link]
 
 ---
 
@@ -38,12 +37,14 @@ Strider is extremely customizable through plugins. Plugins can
     - [Docker](#strider-in-docker)
 - [Advanced Topics](#advanced-topics)
 - [API Documentation](#api-documentation)
+- [Resources](#resources)
+    - [Strider Tutorial Series][resource-strider-futurestudio-tutorials]
 - [Support & Help](#support--help)
 - [Roadmap / Changelog][roadmap]
 
 ## General Requirements
 
-- [nodejs] >= v0.10
+- [nodejs] >= 0.10
 - [npm] >= 2.0
 - [git] >= 2.0
 - [mongodb][mongo-download] (local or remote)
@@ -151,6 +152,7 @@ Please post related issues in the [issues section](https://github.com/Strider-CD
 
 ## Resources
 
+- [Strider Tutorial Series][resource-strider-futurestudio-tutorials] - Extensive guides about Strider covering platform setup, 3rd party integrations (GitHub, GitLab, etc), continuous deployments (Heroku, SSH), notifications (email, Slack, HipChat), how to create your own Strider plugin and many more.
 - [Strider on DigitalOcean][resource-digitalocean] - Covers setting up an Ubuntu machine with Strider using upstart.
 - [Strider plugin template][resource-plugin-template] - Simple setup for getting started with your own plugin.
 - [Panamax Strider template][resource-panamax-template] - Strider template for use with Panamax.
@@ -183,7 +185,6 @@ If nobody is responding, don't leave immediately. Someone will eventually respon
 
 For a view of what's going on with the project, check out our boards by setting up [ZenBoard] and visiting the "Boards" page.
 
-
 [logo]: https://raw.github.com/Strider-CD/strider/master/public/images/top_github.png
 [build-img]: http://public-ci.stridercd.com/Strider-CD/strider/badge
 [build-link]: https://public-ci.stridercd.com/Strider-CD/strider
@@ -191,8 +192,8 @@ For a view of what's going on with the project, check out our boards by setting 
 [dep-link]: https://david-dm.org/Strider-CD/strider
 [dev-dep-img]: https://david-dm.org/Strider-CD/strider/dev-status.svg
 [dev-dep-link]: https://david-dm.org/Strider-CD/strider#info=devDependencies
-[npm-badge-img]: https://nodei.co/npm/strider.svg?downloads=true&stars=true
-[npm-badge-link]: https://nodei.co/npm/strider/
+[npm-badge-img]: https://badge.fury.io/js/strider.svg
+[npm-badge-link]: http://badge.fury.io/js/strider
 [screenshot]: /docs/screenshots/dashboard.jpg?raw=true
 [more-screenshots]: https://github.com/Strider-CD/strider/wiki/Screenshots
 [mongolab]: https://mongolab.com/plans/pricing/
@@ -224,3 +225,4 @@ For a view of what's going on with the project, check out our boards by setting 
 [travis-badge]: https://travis-ci.org/Strider-CD/strider.svg
 [travis-badge-link]: https://travis-ci.org/Strider-CD/strider
 [apiDoc]: http://apidocjs.com/#getting-started
+[resource-strider-futurestudio-tutorials]: https://futurestud.io/blog/strider-getting-started-platform-overview/
